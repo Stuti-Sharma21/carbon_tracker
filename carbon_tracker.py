@@ -4,6 +4,7 @@ print("1) Add a new record for today ")
 print("2) View history")
 print("3) Exit")
 print("4) Weekly summary")
+print("5) My Streak")
 
 
 choicee=int(input("Please enter your choice : "))
@@ -92,9 +93,32 @@ elif choicee==4 :
     print("Best day (lowest):", min(emission))
     print("Worst day (highest):", max(emission))
 
+elif choicee==5 :
+    print("Weekly Summary")
 
-    
+    with open("carbon_history.txt","r") as file:
+        lines=file.readlines()
 
+    if not lines:
+        print("no data available")
+
+    current_streak=0
+    longest_streak=0
+
+    for line in lines:
+        part=line.split(",")
+        emission_val=float(part[3].replace("kg","").strip())
+        
+        if emission_val<=20:
+            current_streak+=1
+            longest_streak=max(longest_streak,current_streak)
+
+        else:
+            current_streak=0
+
+
+    print("Your current streak is:", current_streak)
+    print("Your longest streak is:", longest_streak)
 
 else:
     print("Invalid Choice ")
