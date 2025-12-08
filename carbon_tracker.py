@@ -3,12 +3,15 @@ print("Hi what do u want for today")
 print("1) Add a new record for today ")
 print("2) View history")
 print("3) Exit")
-print("4) ")
+print("4) Weekly summary")
+
+
 choicee=int(input("Please enter your choice : "))
 if choicee==1:
     carbon_emission=0.2 # (1 km = 0.2 kg CO₂)
     daily_limit=20
     unit=0.8 # (1 electricity unit = 0.8 kg CO₂)
+
     while True:
         #travel
         km=float(input("Enter the number of kilometers u traveled today : "))
@@ -62,8 +65,36 @@ elif choicee==2:
         else:
             print(data)
 
-elif choicee:
+elif choicee==3 :
     print("Exiting The Program ")
+
+elif choicee==4 :
+    print("Weekly Summary")
+     
+    with open("carbon_history.txt","r") as file:
+        lines=file.readlines()
+
+    if not lines:
+        print("no data available")
+        
+    emission = []
+
+    for line in lines:
+        parts=line.split(",")
+        emission_val=float(parts[3].replace("kg","").strip())
+        emission.append(emission_val)
+
+    total=sum(emission)
+    average=total/len(emission)
+
+    print("Total emissions:", total)
+    print("Average per day:", average)
+    print("Best day (lowest):", min(emission))
+    print("Worst day (highest):", max(emission))
+
+
+    
+
 
 else:
     print("Invalid Choice ")
