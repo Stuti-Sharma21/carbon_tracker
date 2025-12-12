@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import os
 
 st.title("Daily Carbon Tracker ")
 
@@ -36,4 +38,30 @@ if st.button("Calculate Emission"):# for button
     else:
         credits = (total_emission - daily_limit) * 0.3
         st.error(f"You exceeded the limit! Credits needed: {credits}")
+
+# Today's data
+    data = {
+    "km": km,
+    "electricity": electricity,
+    "food": food,
+    "travel_emission": travel_emission,
+    "electricity_emission": electricity_emission,
+    "food_emission": food_emission,
+    "total_emission": total_emission,
+    "credits": credits
+    }
+
+    #saving new data to csv 
+
+    if os.path.exists("history.csv"): # to check if file exist
+        df = pd.read_csv("history.csv") # saves previous day's data
+        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)  # adds today's data with previous day's data
+    else:
+        df = pd.DataFrame([data]) # create record if doesnt exist 
+
+    df.to_csv("history.csv",index=False) # to save data 
+
+    st.success("Saved today's record successfully!")
+
+
 
