@@ -64,13 +64,32 @@ if st.button("Calculate Emission"):# for button
     st.success("Saved today's record successfully!")
 
 # View History
-if st.button("View HIStory"):
+if st.button("View History"):
     if os.path.exists("history.csv"):
         df=pd.read_csv("history.csv")
         st.dataframe(df)
 
     else:
         st.warning("no data available")
+
+# View Weekly summary
+if st.button("Weekly Summary"):
+    if os.path.exists("history.csv"):
+        df=pd.read_csv("history.csv")
+
+        total=df["total_emission"].sum()
+        average=df["total_emission"].mean()
+        minimum=df["total_emission"].min()
+        maximum=df["total_emission"].max()
+
+        st.write(f" Total emissions:  {total:.2f} kg CO₂")
+        st.write(f" Average per day:  {average:.2f} kg CO₂")
+        st.write(f" Best day:  {minimum:.2f} kg CO₂")
+        st.write(f" Worst day:   {maximum:.2f} kg CO₂")
+
+    else:
+        st.warning("No data available for summary.")
+
 
 
 
