@@ -2,116 +2,122 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.title("Daily Carbon Tracker ")
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to:", ["Home", "View History", "Weekly Summary", "Streak Score"])
 
-st.write("Welcome! Enter your daily activities to calculate your carbon emission.")
+if page == "Home":
+    st.title("Daily Carbon Tracker ")
+    
+    st.write("Welcome! Enter your daily activities to calculate your carbon emission.")
 
-km = st.number_input("Kilometers traveled today : ")
-electricity = st.number_input("Electricity units used : ")
-food = st.selectbox("What meal did you eat today?", ["veg", "non veg"])
+    km = st.number_input("Kilometers traveled today : ")
+    electricity = st.number_input("Electricity units used : ")
+    food = st.selectbox("What meal did you eat today?", ["veg", "non veg"])
 
-if st.button("Calculate Emission"):# for button
-    #now button logic
-    carbon_emission = 0.2
-    unit = 0.8
-    daily_limit = 20
+    if st.button("Calculate Emission"):# for button
+        #now button logic
+        carbon_emission = 0.2
+        unit = 0.8
+        daily_limit = 20
 
-    travel_emission = km * carbon_emission
-    electricity_emission = electricity * unit
+        travel_emission = km * carbon_emission
+        electricity_emission = electricity * unit
 
-    if food == "veg":
-        food_emission = 1
-    else:
-        food_emission = 3
+        if food == "veg":
+            food_emission = 1
+        else:
+            food_emission = 3
 
-    total_emission = travel_emission + electricity_emission + food_emission
+        total_emission = travel_emission + electricity_emission + food_emission
 
-    st.subheader("Your Daily Emission Report:")
-    st.write("Travel emission:", travel_emission, "kg CO₂")
-    st.write("Electricity emission:", electricity_emission, "kg CO₂")
-    st.write("Food emission:", food_emission, "kg CO₂")
-    st.write("Total emission:", total_emission, "kg CO₂")
+        st.subheader("Your Daily Emission Report:")
+        st.write("Travel emission:", travel_emission, "kg CO₂")
+        st.write("Electricity emission:", electricity_emission, "kg CO₂")
+        st.write("Food emission:", food_emission, "kg CO₂")
+        st.write("Total emission:", total_emission, "kg CO₂")
 
-    if total_emission <= daily_limit:
-        credits = (daily_limit - total_emission) * 0.5
-        st.success(f"You're under the limit! Credits earned: {credits}")
-    else:
-        credits = (total_emission - daily_limit) * 0.3
-        st.error(f"You exceeded the limit! Credits needed: {credits}")
+        if total_emission <= daily_limit:
+            credits = (daily_limit - total_emission) * 0.5
+            st.success(f"You're under the limit! Credits earned: {credits}")
+        else:
+            credits = (total_emission - daily_limit) * 0.3
+            st.error(f"You exceeded the limit! Credits needed: {credits}")
 
-# Today's data
-    data = {
-    "km": km,
-    "electricity": electricity,
-    "food": food,
-    "travel_emission": travel_emission,
-    "electricity_emission": electricity_emission,
-    "food_emission": food_emission,
-    "total_emission": total_emission,
-    "credits": credits
-    }
+    # Today's data
+        data = {
+        "km": km,
+        "electricity": electricity,
+        "food": food,
+        "travel_emission": travel_emission,
+        "electricity_emission": electricity_emission,
+        "food_emission": food_emission,
+        "total_emission": total_emission,
+        "credits": credits
+        }
 
-    #saving new data to csv 
+        #saving new data to csv 
 
-    if os.path.exists("history.csv"): # to check if file exist
-        df = pd.read_csv("history.csv") # saves previous day's data
-        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)  # adds today's data with previous day's data
+        if os.path.exists("history.csv"): # to check if file exist
+            df = pd.read_csv("history.csv") # saves previous day's data
+            df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)  # adds today's data with previous day's data
         
-    else:
-        df = pd.DataFrame([data]) # create record if doesnt exist 
+        else:
+            df = pd.DataFrame([data]) # create record if doesnt exist 
 
-    df = df.round(2)
-    df.to_csv("history.csv",index=False) # to save data 
+        df = df.round(2)
+        df.to_csv("history.csv",index=False) # to save data 
 
-    st.success("Saved today's record successfully!")
+        st.success("Saved today's record successfully!")
 
-# View History
-if st.button("View History"):
+elif page == "View History":
+        st.title("View History")
+        if os.path.exists("history.csv"):
+            df=pd.read_csv("history.csv")
+            st.dataframe(df)
+
+        else:
+            st.warning("no data available")
+
+elif page == "Weekly Summary":
+    st.title("Weekly Summary")
+
     if os.path.exists("history.csv"):
-        df=pd.read_csv("history.csv")
-        st.dataframe(df)
+        df = pd.read_csv("history.csv")
 
-    else:
-        st.warning("no data available")
+        total = df["total_emission"].sum()
+        average = df["total_emission"].mean()
+        minimum = df["total_emission"].min()
+        maximum = df["total_emission"].max()
 
-# View Weekly summary
-if st.button("Weekly Summary"):
-    if os.path.exists("history.csv"):
-        df=pd.read_csv("history.csv")
-
-        total=df["total_emission"].sum()
-        average=df["total_emission"].mean()
-        minimum=df["total_emission"].min()
-        maximum=df["total_emission"].max()
-
-        st.write(f" Total emissions:  {total:.2f} kg CO₂")
-        st.write(f" Average per day:  {average:.2f} kg CO₂")
-        st.write(f" Best day:  {minimum:.2f} kg CO₂")
-        st.write(f" Worst day:   {maximum:.2f} kg CO₂")
+        st.write(f" Total emissions: {total:.2f} kg CO₂")
+        st.write(f" Average per day: {average:.2f} kg CO₂")
+        st.write(f" Best day: {minimum:.2f} kg CO₂")
+        st.write(f" Worst day: {maximum:.2f} kg CO₂")
 
     else:
         st.warning("No data available for summary.")
 
 
-#Streak Info
-if st.button(" Streak Score") :
-    if os.path.exists("history.csv"):
-        df=pd.read_csv("history.csv")
+elif page == "Streak Score":
+        st.title("Streak Score")
 
-        current_streak=0
-        longest_streak=0
+        if os.path.exists("history.csv"):
+            df=pd.read_csv("history.csv")
+
+            current_streak=0
+            longest_streak=0
         
-        for val in df["total_emission"]:
-            if val <= 20:
-                current_streak += 1
-                longest_streak = max(longest_streak, current_streak)
-            else:
-                current_streak = 0
+            for val in df["total_emission"]:
+                if val <= 20:
+                    current_streak += 1
+                    longest_streak = max(longest_streak, current_streak)
+                else:
+                    current_streak = 0
 
-        st.write("  Current Streak:  ", current_streak)
-        st.write(" Longest Streak:  ", longest_streak)
-    else:
-        st.warning("No Data Available")
+            st.write("  Current Streak:  ", current_streak)
+            st.write(" Longest Streak:  ", longest_streak)
+        else:
+            st.warning("No Data Available")
 
 
 
