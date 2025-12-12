@@ -63,5 +63,15 @@ if st.button("Calculate Emission"):# for button
 
     st.success("Saved today's record successfully!")
 
+# View History
+if st.button("View HIStory"):
+    if os.path.exists("history.csv"):
+        df=pd.read_csv("history.csv")
+        st.dataframe(df)
+
+    else:
+        st.warning("no data available")
+
+
 
 
