@@ -56,9 +56,11 @@ if st.button("Calculate Emission"):# for button
     if os.path.exists("history.csv"): # to check if file exist
         df = pd.read_csv("history.csv") # saves previous day's data
         df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)  # adds today's data with previous day's data
+        
     else:
         df = pd.DataFrame([data]) # create record if doesnt exist 
 
+    df = df.round(2)
     df.to_csv("history.csv",index=False) # to save data 
 
     st.success("Saved today's record successfully!")
@@ -89,6 +91,28 @@ if st.button("Weekly Summary"):
 
     else:
         st.warning("No data available for summary.")
+
+
+#Streak Info
+if st.button(" Streak Score") :
+    if os.path.exists("history.csv"):
+        df=pd.read_csv("history.csv")
+
+        current_streak=0
+        longest_streak=0
+        
+        for val in df["total_emission"]:
+            if val <= 20:
+                current_streak += 1
+                longest_streak = max(longest_streak, current_streak)
+            else:
+                current_streak = 0
+
+        st.write("  Current Streak:  ", current_streak)
+        st.write(" Longest Streak:  ", longest_streak)
+    else:
+        st.warning("No Data Available")
+
 
 
 
